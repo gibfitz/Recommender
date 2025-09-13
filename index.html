@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Recommendations</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        const RecommendationApp = () => {
+          const [formData, setFormData] = useState({
+            movies: '',
+            tvShows: '',
+            books: '',
+            music: '',
+            podcasts: ''
+          });
+          
+          const [recommendations, setRecommendations] = useState('');
+          const [isLoading, setIsLoading] = useState(false);
+
+          const handleInputChange = (e) => {
+            const { name, value } = e.target;
+            setFormData(prev => ({
+              ...prev,
+              [name]: value
+            }));
+          };
+
+          const generateRecommendations = async () => {
+            const hasInput = Object.values(formData).some(value => value.trim() !== '');
+            if (!hasInput) {
+              alert('Please fill in at least one preference field.');
+              return;
+            }
+
+            setIsLoading(true);
+            
+            setTimeout(() => {
+              const movieRecs = analyzeMovies(formData.movies);
+              const tvRecs = analyzeTVShows(formData.tvShows);
+              const bookRecs = analyzeBooks(formData.books);
+              const musicRecs = analyzeMusic(formData.music);
+              const podcastRecs = analyzePodcasts(formData.podcasts);
+              
+              const fullRecommendations = formatRecommendations({
+                movies: movieRecs,
+                tv: tvRecs,
+                books: bookRecs,
+                music: musicRecs,
+                podcasts: podcastRecs
+              });
+              
+              setRecommendations(fullRecommendations);
+              setIsLoading(false);
+            }, 2000);
+          };
+
+          const analyzeMovies = (movies) => {
+            if (!movies.trim()) return [];
+            
+            const movieDatabase = {
+              'way way back': ['Little Miss Sunshine', 'Hunt for the Wilderpeople', 'The Spectacular Now'],
+              'little miss sunshine': ['Juno', 'The Way Way Back', 'Captain Fantastic'],
+              'juno': ['Lady Bird', 'Eighth Grade', 'The Edge of Seventeen'],
+              'love actually': ['About Time', 'Four Weddings and a Funeral', 'The Holiday'],
+              'about time': ['Midnight in Paris', 'The Time Traveler\'s Wife', 'Yesterday'],
+              'moonrise kingdom': ['The Grand Budapest Hotel', 'Her', 'Lost in Translation'],
+              'her': ['Eternal Sunshine of the Spotless Mind', '500 Days of Summer', 'The Shape of Water'],
+              'inception': ['Interstellar', 'The Matrix', 'Shutter Island'],
+              'matrix': ['Blade Runner 2049', 'Ex Machina', 'Ghost in the Shell'],
+              'pulp fiction': ['Kill Bill', 'Reservoir Dogs', 'Snatch'],
+              'default': ['Parasite', 'The Grand Budapest Hotel', 'Manchester by the Sea']
+            };
+            
+            const lowerMovies = movies.toLowerCase();
+            for (const [key, recs] of Object.entries(movieDatabase)) {
+              if (lowerMovies.includes(key)) {
+                return recs;
+              }
+            }
+            return movieDatabase.default;
+          };
+
+          const analyzeTVShows = (shows) => {
+            if (!shows.trim()) return [];
+            
+            const showDatabase = {
+              'ozark': ['Breaking Bad', 'Better Call Saul', 'Yellowjackets'],
+              'breaking bad': ['Ozark', 'The Sopranos', 'Fargo'],
+              'the office': ['Parks and Recreation', 'Brooklyn Nine-Nine', 'Ted Lasso'],
+              'parks and recreation': ['The Good Place', 'Community', 'Schitt\'s Creek'],
+              'wayne': ['The End of the F***ing World', 'I Am Not Okay with This', 'Russian Doll'],
+              'seinfeld': ['Curb Your Enthusiasm', 'It\'s Always Sunny in Philadelphia', 'Veep'],
+              'stranger things': ['Dark', 'The Umbrella Academy', 'Supernatural'],
+              'game of thrones': ['The Witcher', 'House of the Dragon', 'Vikings'],
+              'default': ['The Bear', 'Severance', 'Only Murders in the Building']
+            };
+            
+            const lowerShows = shows.toLowerCase();
+            for (const [key, recs] of Object.entries(showDatabase)) {
+              if (lowerShows.includes(key)) {
+                return recs;
+              }
+            }
+            return showDatabase.default;
+          };
+
+          const analyzeBooks = (books) => {
+            if (!books.trim()) return [];
+            
+            const bookDatabase = {
+              'midnight library': ['The Seven Husbands of Evelyn Hugo', 'Klara and the Sun', 'The Invisible Life of Addie LaRue'],
+              'the dog stars': ['Station Eleven', 'The Road', 'Zone One'],
+              'station eleven': ['The Leftovers', 'California', 'The Age of Miracles'],
+              'harry potter': ['Percy Jackson', 'The Hunger Games', 'His Dark Materials'],
+              '1984': ['Brave New World', 'Fahrenheit 451', 'The Handmaid\'s Tale'],
+              'great gatsby': ['To Kill a Mockingbird', 'The Catcher in the Rye', 'Of Mice and Men'],
+              'default': ['Where the Crawdads Sing', 'Educated', 'The Thursday Murder Club']
+            };
+            
+            const lowerBooks = books.toLowerCase();
+            for (const [key, recs] of Object.entries(bookDatabase)) {
+              if (lowerBooks.includes(key)) {
+                return recs;
+              }
+            }
+            return bookDatabase.default;
+          };
+
+          const analyzeMusic = (music) => {
+            if (!music.trim()) return [];
+            
+            const musicDatabase = {
+              'rem': ['The National', 'Arcade Fire', 'Vampire Weekend'],
+              'r.e.m.': ['The National', 'Arcade Fire', 'Vampire Weekend'],
+              'u2': ['Coldplay', 'Radiohead', 'The Killers'],
+              'lyle lovett': ['Wilco', 'Ryan Adams', 'Jason Isbell'],
+              'beatles': ['The Beach Boys', 'The Rolling Stones', 'Bob Dylan'],
+              'taylor swift': ['Phoebe Bridgers', 'Lorde', 'Billie Eilish'],
+              'drake': ['Kendrick Lamar', 'J. Cole', 'The Weeknd'],
+              'default': ['Phoebe Bridgers', 'The War on Drugs', 'Fleet Foxes']
+            };
+            
+            const lowerMusic = music.toLowerCase();
+            for (const [key, recs] of Object.entries(musicDatabase)) {
+              if (lowerMusic.includes(key)) {
+                return recs;
+              }
+            }
+            return musicDatabase.default;
+          };
+
+          const analyzePodcasts = (podcasts) => {
+            if (!podcasts.trim()) return [];
+            
+            const podcastDatabase = {
+              's-town': ['In the Dark', 'Bear Brook', 'The Thing About Pam'],
+              'serial': ['Criminal', 'My Favorite Murder', 'Up and Vanished'],
+              'revisionist history': ['You\'re Wrong About', 'Decoder Ring', 'The Memory Palace'],
+              'working it out': ['Conan O\'Brien Needs a Friend', 'WTF with Marc Maron', 'Armchair Expert'],
+              'joe rogan': ['Lex Fridman Podcast', 'The Tim Ferriss Show', 'PowerfulJRE'],
+              'this american life': ['Radiolab', 'Planet Money', 'Hidden Brain'],
+              'default': ['The Daily', 'This American Life', 'Radiolab']
+            };
+            
+            const lowerPodcasts = podcasts.toLowerCase();
+            for (const [key, recs] of Object.entries(podcastDatabase)) {
+              if (lowerPodcasts.includes(key)) {
+                return recs;
+              }
+            }
+            return podcastDatabase.default;
+          };
+
+          const formatRecommendations = ({ movies, tv, books, music, podcasts }) => {
+            let result = '';
+            
+            if (movies.length > 0) {
+              result += '🎬 MOVIES\n\n';
+              movies.forEach((movie, index) => {
+                result += `${index + 1}. ${movie}\n`;
+              });
+              result += '\n';
+            }
+            
+            if (tv.length > 0) {
+              result += '📺 TV SHOWS\n\n';
+              tv.forEach((show, index) => {
+                result += `${index + 1}. ${show}\n`;
+              });
+              result += '\n';
+            }
+            
+            if (books.length > 0) {
+              result += '📚 BOOKS\n\n';
+              books.forEach((book, index) => {
+                result += `${index + 1}. ${book}\n`;
+              });
+              result += '\n';
+            }
+            
+            if (music.length > 0) {
+              result += '🎵 MUSIC ARTISTS\n\n';
+              music.forEach((artist, index) => {
+                result += `${index + 1}. ${artist}\n`;
+              });
+              result += '\n';
+            }
+            
+            if (podcasts.length > 0) {
+              result += '🎧 PODCASTS\n\n';
+              podcasts.forEach((podcast, index) => {
+                result += `${index + 1}. ${podcast}\n`;
+              });
+            }
+            
+            return result;
+          };
+
+          return React.createElement('div', {
+            className: "min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-blue-800 p-6"
+          }, 
+            React.createElement('div', {
+              className: "max-w-4xl mx-auto"
+            },
+              React.createElement('div', {
+                className: "bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-6"
+              },
+                React.createElement('h1', {
+                  className: "text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                }, "🎬 Personal Recommendations"),
+                React.createElement('p', {
+                  className: "text-center text-gray-600 mb-8"
+                }, "Get instant personalized recommendations based on your favorites"),
+                
+                React.createElement('div', {
+                  className: "grid gap-6"
+                },
+                  React.createElement('div', {
+                    className: "space-y-2"
+                  },
+                    React.createElement('label', {
+                      className: "block text-sm font-semibold text-gray-700"
+                    }, "🎬 Favorite Movies"),
+                    React.createElement('input', {
+                      type: "text",
+                      name: "movies",
+                      value: formData.movies,
+                      onChange: handleInputChange,
+                      placeholder: "e.g., Inception, The Matrix, Love Actually",
+                      className: "w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+                    })
+                  ),
+                  
+                  React.createElement('div', {
+                    className: "space-y-2"
+                  },
+                    React.createElement('label', {
+                      className: "block text-sm font-semibold text-gray-700"
+                    }, "📺 Favorite TV Shows"),
+                    React.createElement('input', {
+                      type: "text",
+                      name: "tvShows",
+                      value: formData.tvShows,
+                      onChange: handleInputChange,
+                      placeholder: "e.g., The Office, Breaking Bad, Ozark",
+                      className: "w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+                    })
+                  ),
+                  
+                  React.createElement('div', {
+                    className: "space-y-2"
+                  },
+                    React.createElement('label', {
+                      className: "block text-sm font-semibold text-gray-700"
+                    }, "📚 Favorite Books"),
+                    React.createElement('input', {
+                      type: "text",
+                      name: "books",
+                      value: formData.books,
+                      onChange: handleInputChange,
+                      placeholder: "e.g., The Midnight Library, Harry Potter",
+                      className: "w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+                    })
+                  ),
+                  
+                  React.createElement('div', {
+                    className: "space-y-2"
+                  },
+                    React.createElement('label', {
+                      className: "block text-sm font-semibold text-gray-700"
+                    }, "🎵 Favorite Musical Artists"),
+                    React.createElement('input', {
+                      type: "text",
+                      name: "music",
+                      value: formData.music,
+                      onChange: handleInputChange,
+                      placeholder: "e.g., The Beatles, Taylor Swift, R.E.M.",
+                      className: "w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+                    })
+                  ),
+                  
+                  React.createElement('div', {
+                    className: "space-y-2"
+                  },
+                    React.createElement('label', {
+                      className: "block text-sm font-semibold text-gray-700"
+                    }, "🎧 Favorite Podcasts"),
+                    React.createElement('input', {
+                      type: "text",
+                      name: "podcasts",
+                      value: formData.podcasts,
+                      onChange: handleInputChange,
+                      placeholder: "e.g., Serial, This American Life, S-Town",
+                      className: "w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+                    })
+                  ),
+                  
+                  React.createElement('button', {
+                    onClick: generateRecommendations,
+                    disabled: isLoading,
+                    className: "w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  }, isLoading ? 
+                    React.createElement('span', {
+                      className: "flex items-center justify-center"
+                    },
+                      React.createElement('div', {
+                        className: "animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"
+                      }),
+                      "Analyzing Your Taste..."
+                    ) :
+                    "✨ Get My Recommendations"
+                  )
+                )
+              ),
+              
+              recommendations && React.createElement('div', {
+                className: "bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8"
+              },
+                React.createElement('h2', {
+                  className: "text-2xl font-bold text-gray-800 mb-6 text-center"
+                }, "Your Personalized Recommendations"),
+                React.createElement('div', {
+                  className: "bg-gray-50 rounded-xl p-6"
+                },
+                  React.createElement('pre', {
+                    className: "whitespace-pre-wrap text-gray-800 leading-relaxed font-mono text-sm"
+                  }, recommendations)
+                )
+              )
+            )
+          );
+        };
+
+        ReactDOM.render(React.createElement(RecommendationApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
