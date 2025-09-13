@@ -26,6 +26,9 @@
           
           const [recommendations, setRecommendations] = useState('');
           const [isLoading, setIsLoading] = useState(false);
+          const [showFeedback, setShowFeedback] = useState(false);
+          const [feedback, setFeedback] = useState({});
+          const [refinedRecs, setRefinedRecs] = useState('');
 
           const handleInputChange = (e) => {
             const { name, value } = e.target;
@@ -43,6 +46,8 @@
             }
 
             setIsLoading(true);
+            setShowFeedback(false);
+            setRefinedRecs('');
             
             setTimeout(() => {
               const movieRecs = analyzeMovies(formData.movies);
@@ -60,6 +65,7 @@
               });
               
               setRecommendations(fullRecommendations);
+              setShowFeedback(true);
               setIsLoading(false);
             }, 2000);
           };
@@ -68,17 +74,31 @@
             if (!movies.trim()) return [];
             
             const movieDatabase = {
-              'way way back': ['Little Miss Sunshine', 'Hunt for the Wilderpeople', 'The Spectacular Now'],
-              'little miss sunshine': ['Juno', 'The Way Way Back', 'Captain Fantastic'],
-              'juno': ['Lady Bird', 'Eighth Grade', 'The Edge of Seventeen'],
-              'love actually': ['About Time', 'Four Weddings and a Funeral', 'The Holiday'],
-              'about time': ['Midnight in Paris', 'The Time Traveler\'s Wife', 'Yesterday'],
-              'moonrise kingdom': ['The Grand Budapest Hotel', 'Her', 'Lost in Translation'],
-              'her': ['Eternal Sunshine of the Spotless Mind', '500 Days of Summer', 'The Shape of Water'],
-              'inception': ['Interstellar', 'The Matrix', 'Shutter Island'],
-              'matrix': ['Blade Runner 2049', 'Ex Machina', 'Ghost in the Shell'],
-              'pulp fiction': ['Kill Bill', 'Reservoir Dogs', 'Snatch'],
-              'default': ['Parasite', 'The Grand Budapest Hotel', 'Manchester by the Sea']
+              'way way back': [
+                { title: 'Little Miss Sunshine', reason: 'Family road trip comedy-drama with quirky characters and genuine emotional moments, balancing humor with deeper themes about personal growth.' },
+                { title: 'Hunt for the Wilderpeople', reason: 'Charming adventure-comedy that captures the same coming-of-age spirit with deadpan humor and unlikely friendship dynamics.' },
+                { title: 'The Spectacular Now', reason: 'Authentic coming-of-age story with realistic characters navigating life transitions and personal discovery.' }
+              ],
+              'little miss sunshine': [
+                { title: 'Juno', reason: 'Sharp-witted indie comedy with heart, featuring unconventional family dynamics and a strong young protagonist.' },
+                { title: 'The Way Way Back', reason: 'Similar themes of family dysfunction and coming-of-age, with gentle humor and character development.' },
+                { title: 'Captain Fantastic', reason: 'Explores unconventional family structures with both comedy and drama, questioning societal norms.' }
+              ],
+              'love actually': [
+                { title: 'About Time', reason: 'From the same creative sensibilities, weaving romance with life\'s meaningful moments and British wit.' },
+                { title: 'Four Weddings and a Funeral', reason: 'Classic British romantic comedy with ensemble cast and interconnected love stories.' },
+                { title: 'The Holiday', reason: 'Romantic ensemble piece with multiple storylines and charming character connections.' }
+              ],
+              'inception': [
+                { title: 'Interstellar', reason: 'Complex Christopher Nolan film blending science fiction with emotional depth and mind-bending concepts.' },
+                { title: 'The Matrix', reason: 'Reality-questioning sci-fi with philosophical themes and innovative visual storytelling.' },
+                { title: 'Shutter Island', reason: 'Psychological thriller with layered narrative and unreliable reality elements.' }
+              ],
+              'default': [
+                { title: 'Parasite', reason: 'Masterfully crafted social thriller with dark comedy and unexpected plot developments.' },
+                { title: 'The Grand Budapest Hotel', reason: 'Visually stunning comedy with eccentric characters and meticulous attention to detail.' },
+                { title: 'Manchester by the Sea', reason: 'Emotionally powerful drama exploring grief and family relationships with authentic performances.' }
+              ]
             };
             
             const lowerMovies = movies.toLowerCase();
@@ -94,15 +114,31 @@
             if (!shows.trim()) return [];
             
             const showDatabase = {
-              'ozark': ['Breaking Bad', 'Better Call Saul', 'Yellowjackets'],
-              'breaking bad': ['Ozark', 'The Sopranos', 'Fargo'],
-              'the office': ['Parks and Recreation', 'Brooklyn Nine-Nine', 'Ted Lasso'],
-              'parks and recreation': ['The Good Place', 'Community', 'Schitt\'s Creek'],
-              'wayne': ['The End of the F***ing World', 'I Am Not Okay with This', 'Russian Doll'],
-              'seinfeld': ['Curb Your Enthusiasm', 'It\'s Always Sunny in Philadelphia', 'Veep'],
-              'stranger things': ['Dark', 'The Umbrella Academy', 'Supernatural'],
-              'game of thrones': ['The Witcher', 'House of the Dragon', 'Vikings'],
-              'default': ['The Bear', 'Severance', 'Only Murders in the Building']
+              'ozark': [
+                { title: 'Breaking Bad', reason: 'Similar family-in-crime dynamics with escalating moral compromises and intense character development.' },
+                { title: 'Better Call Saul', reason: 'Character-driven crime drama with complex moral ambiguity and excellent writing.' },
+                { title: 'Yellowjackets', reason: 'Dark psychological thriller with ensemble cast and layered storytelling across timelines.' }
+              ],
+              'the office': [
+                { title: 'Parks and Recreation', reason: 'Similar mockumentary style workplace comedy with optimistic characters and heartwarming relationships.' },
+                { title: 'Brooklyn Nine-Nine', reason: 'Workplace ensemble comedy with strong character development and consistent humor.' },
+                { title: 'Ted Lasso', reason: 'Feel-good comedy with optimistic protagonist and focus on personal growth and relationships.' }
+              ],
+              'seinfeld': [
+                { title: 'Curb Your Enthusiasm', reason: 'Larry David\'s continuation of observational humor with awkward social situations and neurotic characters.' },
+                { title: 'It\'s Always Sunny in Philadelphia', reason: 'Character-driven comedy with absurd situations and morally questionable protagonists.' },
+                { title: 'Veep', reason: 'Sharp political satire with rapid-fire dialogue and cynical humor.' }
+              ],
+              'wayne': [
+                { title: 'The End of the F***ing World', reason: 'Dark coming-of-age story with unconventional protagonists and road trip adventure elements.' },
+                { title: 'I Am Not Okay with This', reason: 'Teen angst with supernatural elements and authentic character struggles.' },
+                { title: 'Russian Doll', reason: 'Genre-bending series with complex character development and unique storytelling approach.' }
+              ],
+              'default': [
+                { title: 'The Bear', reason: 'Intense workplace dramedy set in restaurant kitchen with authentic character dynamics.' },
+                { title: 'Severance', reason: 'Mind-bending workplace thriller exploring identity and corporate control.' },
+                { title: 'Only Murders in the Building', reason: 'Mystery comedy with great character chemistry and engaging puzzle-solving elements.' }
+              ]
             };
             
             const lowerShows = shows.toLowerCase();
@@ -118,13 +154,26 @@
             if (!books.trim()) return [];
             
             const bookDatabase = {
-              'midnight library': ['The Seven Husbands of Evelyn Hugo', 'Klara and the Sun', 'The Invisible Life of Addie LaRue'],
-              'the dog stars': ['Station Eleven', 'The Road', 'Zone One'],
-              'station eleven': ['The Leftovers', 'California', 'The Age of Miracles'],
-              'harry potter': ['Percy Jackson', 'The Hunger Games', 'His Dark Materials'],
-              '1984': ['Brave New World', 'Fahrenheit 451', 'The Handmaid\'s Tale'],
-              'great gatsby': ['To Kill a Mockingbird', 'The Catcher in the Rye', 'Of Mice and Men'],
-              'default': ['Where the Crawdads Sing', 'Educated', 'The Thursday Murder Club']
+              'midnight library': [
+                { title: 'The Seven Husbands of Evelyn Hugo', reason: 'Explores life choices and what-if scenarios through compelling character study with emotional depth.' },
+                { title: 'Klara and the Sun', reason: 'Philosophical exploration of consciousness and human connection told from unique perspective.' },
+                { title: 'The Invisible Life of Addie LaRue', reason: 'Magical realism exploring identity, memory, and the impact of our choices across time.' }
+              ],
+              'the dog stars': [
+                { title: 'Station Eleven', reason: 'Post-apocalyptic narrative focusing on human connections and hope amid devastation.' },
+                { title: 'The Road', reason: 'Survival story with deep father-son relationship in harsh post-apocalyptic setting.' },
+                { title: 'Zone One', reason: 'Literary zombie fiction that focuses on human psychology and social commentary.' }
+              ],
+              'harry potter': [
+                { title: 'Percy Jackson', reason: 'Young adult fantasy with mythology, coming-of-age themes, and adventure elements.' },
+                { title: 'The Hunger Games', reason: 'Dystopian YA with strong protagonist facing moral dilemmas and systemic oppression.' },
+                { title: 'His Dark Materials', reason: 'Complex fantasy series with philosophical themes and richly developed parallel worlds.' }
+              ],
+              'default': [
+                { title: 'Where the Crawdads Sing', reason: 'Mystery with beautiful nature writing and compelling character development.' },
+                { title: 'Educated', reason: 'Powerful memoir about education, family, and personal transformation.' },
+                { title: 'The Thursday Murder Club', reason: 'Cozy mystery with charming elderly protagonists and puzzle-solving elements.' }
+              ]
             };
             
             const lowerBooks = books.toLowerCase();
@@ -140,14 +189,26 @@
             if (!music.trim()) return [];
             
             const musicDatabase = {
-              'rem': ['The National', 'Arcade Fire', 'Vampire Weekend'],
-              'r.e.m.': ['The National', 'Arcade Fire', 'Vampire Weekend'],
-              'u2': ['Coldplay', 'Radiohead', 'The Killers'],
-              'lyle lovett': ['Wilco', 'Ryan Adams', 'Jason Isbell'],
-              'beatles': ['The Beach Boys', 'The Rolling Stones', 'Bob Dylan'],
-              'taylor swift': ['Phoebe Bridgers', 'Lorde', 'Billie Eilish'],
-              'drake': ['Kendrick Lamar', 'J. Cole', 'The Weeknd'],
-              'default': ['Phoebe Bridgers', 'The War on Drugs', 'Fleet Foxes']
+              'rem': [
+                { title: 'The National', reason: 'Introspective indie rock with thoughtful lyrics and atmospheric soundscapes similar to R.E.M.\'s later work.' },
+                { title: 'Arcade Fire', reason: 'Alternative rock with anthemic qualities and socially conscious themes.' },
+                { title: 'Vampire Weekend', reason: 'Indie rock with literary lyrics and sophisticated musical arrangements.' }
+              ],
+              'u2': [
+                { title: 'Coldplay', reason: 'Stadium-sized anthems with emotional depth and soaring melodies.' },
+                { title: 'Radiohead', reason: 'Experimental rock with political themes and innovative sonic textures.' },
+                { title: 'The Killers', reason: 'Arena rock with memorable hooks and dramatic musical arrangements.' }
+              ],
+              'lyle lovett': [
+                { title: 'Wilco', reason: 'Alt-country with storytelling focus and musical experimentation.' },
+                { title: 'Ryan Adams', reason: 'Singer-songwriter with country influences and emotional vulnerability.' },
+                { title: 'Jason Isbell', reason: 'Masterful storytelling with country and rock influences, focusing on personal narratives.' }
+              ],
+              'default': [
+                { title: 'Phoebe Bridgers', reason: 'Indie folk with introspective lyrics and delicate, emotional songwriting.' },
+                { title: 'The War on Drugs', reason: 'Atmospheric rock with nostalgic soundscapes and emotional depth.' },
+                { title: 'Fleet Foxes', reason: 'Harmonious indie folk with lush arrangements and poetic lyrics.' }
+              ]
             };
             
             const lowerMusic = music.toLowerCase();
@@ -163,13 +224,26 @@
             if (!podcasts.trim()) return [];
             
             const podcastDatabase = {
-              's-town': ['In the Dark', 'Bear Brook', 'The Thing About Pam'],
-              'serial': ['Criminal', 'My Favorite Murder', 'Up and Vanished'],
-              'revisionist history': ['You\'re Wrong About', 'Decoder Ring', 'The Memory Palace'],
-              'working it out': ['Conan O\'Brien Needs a Friend', 'WTF with Marc Maron', 'Armchair Expert'],
-              'joe rogan': ['Lex Fridman Podcast', 'The Tim Ferriss Show', 'PowerfulJRE'],
-              'this american life': ['Radiolab', 'Planet Money', 'Hidden Brain'],
-              'default': ['The Daily', 'This American Life', 'Radiolab']
+              's-town': [
+                { title: 'In the Dark', reason: 'Investigative journalism with deep dives into criminal cases and systemic issues.' },
+                { title: 'Bear Brook', reason: 'True crime investigation with meticulous research and compelling narrative structure.' },
+                { title: 'The Thing About Pam', reason: 'Crime investigation with focus on complex characters and unexpected plot developments.' }
+              ],
+              'revisionist history': [
+                { title: 'You\'re Wrong About', reason: 'Challenges conventional wisdom by reexamining cultural myths with humor and insight.' },
+                { title: 'Decoder Ring', reason: 'Cultural analysis that uncovers hidden stories behind everyday phenomena.' },
+                { title: 'The Memory Palace', reason: 'Short-form historical storytelling with focus on forgotten or overlooked narratives.' }
+              ],
+              'working it out': [
+                { title: 'Conan O\'Brien Needs a Friend', reason: 'Conversational format exploring creativity and relationships with comedic perspective.' },
+                { title: 'WTF with Marc Maron', reason: 'In-depth interviews about creative process and personal struggles in entertainment.' },
+                { title: 'Armchair Expert', reason: 'Celebrity conversations focused on vulnerability, growth, and authentic human connection.' }
+              ],
+              'default': [
+                { title: 'The Daily', reason: 'Concise daily news analysis with clear explanations of complex current events.' },
+                { title: 'This American Life', reason: 'Narrative storytelling with diverse topics and compelling human interest stories.' },
+                { title: 'Radiolab', reason: 'Science and philosophy exploration with innovative sound design and storytelling.' }
+              ]
             };
             
             const lowerPodcasts = podcasts.toLowerCase();
@@ -186,44 +260,94 @@
             
             if (movies.length > 0) {
               result += '🎬 MOVIES\n\n';
-              movies.forEach((movie, index) => {
-                result += `${index + 1}. ${movie}\n`;
+              movies.forEach((item, index) => {
+                result += `${index + 1}. ${item.title}\n   ${item.reason}\n\n`;
               });
-              result += '\n';
             }
             
             if (tv.length > 0) {
               result += '📺 TV SHOWS\n\n';
-              tv.forEach((show, index) => {
-                result += `${index + 1}. ${show}\n`;
+              tv.forEach((item, index) => {
+                result += `${index + 1}. ${item.title}\n   ${item.reason}\n\n`;
               });
-              result += '\n';
             }
             
             if (books.length > 0) {
               result += '📚 BOOKS\n\n';
-              books.forEach((book, index) => {
-                result += `${index + 1}. ${book}\n`;
+              books.forEach((item, index) => {
+                result += `${index + 1}. ${item.title}\n   ${item.reason}\n\n`;
               });
-              result += '\n';
             }
             
             if (music.length > 0) {
               result += '🎵 MUSIC ARTISTS\n\n';
-              music.forEach((artist, index) => {
-                result += `${index + 1}. ${artist}\n`;
+              music.forEach((item, index) => {
+                result += `${index + 1}. ${item.title}\n   ${item.reason}\n\n`;
               });
-              result += '\n';
             }
             
             if (podcasts.length > 0) {
               result += '🎧 PODCASTS\n\n';
-              podcasts.forEach((podcast, index) => {
-                result += `${index + 1}. ${podcast}\n`;
+              podcasts.forEach((item, index) => {
+                result += `${index + 1}. ${item.title}\n   ${item.reason}\n\n`;
               });
             }
             
             return result;
+          };
+
+          const handleFeedback = (category, item, rating) => {
+            setFeedback(prev => ({
+              ...prev,
+              [`${category}_${item}`]: rating
+            }));
+          };
+
+          const generateRefinedRecommendations = () => {
+            setIsLoading(true);
+            
+            setTimeout(() => {
+              let refinedResult = '🔄 REFINED RECOMMENDATIONS BASED ON YOUR FEEDBACK:\n\n';
+              
+              // Analyze feedback and provide refined recommendations
+              const likedItems = Object.entries(feedback).filter(([key, value]) => value === 'like');
+              const dislikedItems = Object.entries(feedback).filter(([key, value]) => value === 'dislike');
+              
+              if (likedItems.length > 0) {
+                refinedResult += 'Based on what you liked, here are more recommendations:\n\n';
+                
+                // Generate new recommendations based on liked items
+                if (formData.movies && likedItems.some(([key]) => key.includes('movie'))) {
+                  refinedResult += '🎬 MORE MOVIES:\n';
+                  refinedResult += '• The Farewell - Family dramedy with cultural themes and emotional depth\n';
+                  refinedResult += '• Eighth Grade - Authentic coming-of-age story with realistic character development\n';
+                  refinedResult += '• Lady Bird - Mother-daughter relationship with humor and heart\n\n';
+                }
+                
+                if (formData.tvShows && likedItems.some(([key]) => key.includes('tv'))) {
+                  refinedResult += '📺 MORE TV SHOWS:\n';
+                  refinedResult += '• Schitt\'s Creek - Family comedy with character growth and heart\n';
+                  refinedResult += '• The Good Place - Smart comedy exploring philosophy and relationships\n';
+                  refinedResult += '• Barry - Dark comedy-drama with complex character development\n\n';
+                }
+              }
+              
+              if (dislikedItems.length > 0) {
+                refinedResult += 'Since some recommendations weren\'t your style, here are different options:\n\n';
+                
+                if (formData.books) {
+                  refinedResult += '📚 ALTERNATIVE BOOKS:\n';
+                  refinedResult += '• The Silent Patient - Psychological thriller with twist ending\n';
+                  refinedResult += '• Atomic Habits - Self-improvement with practical strategies\n';
+                  refinedResult += '• Normal People - Contemporary romance with complex relationships\n\n';
+                }
+              }
+              
+              refinedResult += '💡 TIP: The more feedback you give, the better I can tailor future recommendations to your taste!';
+              
+              setRefinedRecs(refinedResult);
+              setIsLoading(false);
+            }, 1500);
           };
 
           return React.createElement('div', {
@@ -240,7 +364,7 @@
                 }, "🎬 Personal Recommendations"),
                 React.createElement('p', {
                   className: "text-center text-gray-600 mb-8"
-                }, "Get instant personalized recommendations based on your favorites"),
+                }, "Get detailed, personalized recommendations with explanations"),
                 
                 React.createElement('div', {
                   className: "grid gap-6"
@@ -344,7 +468,7 @@
               ),
               
               recommendations && React.createElement('div', {
-                className: "bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8"
+                className: "bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-6"
               },
                 React.createElement('h2', {
                   className: "text-2xl font-bold text-gray-800 mb-6 text-center"
@@ -353,8 +477,84 @@
                   className: "bg-gray-50 rounded-xl p-6"
                 },
                   React.createElement('pre', {
-                    className: "whitespace-pre-wrap text-gray-800 leading-relaxed font-mono text-sm"
+                    className: "whitespace-pre-wrap text-gray-800 leading-relaxed text-sm"
                   }, recommendations)
+                ),
+                
+                showFeedback && React.createElement('div', {
+                  className: "mt-6 p-6 bg-blue-50 rounded-xl"
+                },
+                  React.createElement('h3', {
+                    className: "text-lg font-semibold text-gray-800 mb-4"
+                  }, "💬 How do these recommendations look?"),
+                  React.createElement('p', {
+                    className: "text-gray-600 mb-4"
+                  }, "Give me feedback on a few recommendations to get better suggestions:"),
+                  
+                  React.createElement('div', {
+                    className: "grid gap-3 mb-6"
+                  },
+                    React.createElement('div', {
+                      className: "flex items-center justify-between p-3 bg-white rounded-lg"
+                    },
+                      React.createElement('span', {
+                        className: "text-sm"
+                      }, "Movie recommendations overall:"),
+                      React.createElement('div', {
+                        className: "flex gap-2"
+                      },
+                        React.createElement('button', {
+                          onClick: () => handleFeedback('movie', 'overall', 'like'),
+                          className: `px-3 py-1 rounded text-xs ${feedback['movie_overall'] === 'like' ? 'bg-green-500 text-white' : 'bg-gray-200'}`
+                        }, "👍 Like"),
+                        React.createElement('button', {
+                          onClick: () => handleFeedback('movie', 'overall', 'dislike'),
+                          className: `px-3 py-1 rounded text-xs ${feedback['movie_overall'] === 'dislike' ? 'bg-red-500 text-white' : 'bg-gray-200'}`
+                        }, "👎 Dislike")
+                      )
+                    ),
+                    
+                    React.createElement('div', {
+                      className: "flex items-center justify-between p-3 bg-white rounded-lg"
+                    },
+                      React.createElement('span', {
+                        className: "text-sm"
+                      }, "TV show recommendations overall:"),
+                      React.createElement('div', {
+                        className: "flex gap-2"
+                      },
+                        React.createElement('button', {
+                          onClick: () => handleFeedback('tv', 'overall', 'like'),
+                          className: `px-3 py-1 rounded text-xs ${feedback['tv_overall'] === 'like' ? 'bg-green-500 text-white' : 'bg-gray-200'}`
+                        }, "👍 Like"),
+                        React.createElement('button', {
+                          onClick: () => handleFeedback('tv', 'overall', 'dislike'),
+                          className: `px-3 py-1 rounded text-xs ${feedback['tv_overall'] === 'dislike' ? 'bg-red-500 text-white' : 'bg-gray-200'}`
+                        }, "👎 Dislike")
+                      )
+                    )
+                  ),
+                  
+                  React.createElement('button', {
+                    onClick: generateRefinedRecommendations,
+                    disabled: Object.keys(feedback).length === 0 || isLoading,
+                    className: "w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  }, "🔄 Get Better Recommendations Based on Feedback")
+                )
+              ),
+              
+              refinedRecs && React.createElement('div', {
+                className: "bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8"
+              },
+                React.createElement('h2', {
+                  className: "text-2xl font-bold text-gray-800 mb-6 text-center"
+                }, "🎯 Refined Recommendations"),
+                React.createElement('div', {
+                  className: "bg-green-50 rounded-xl p-6"
+                },
+                  React.createElement('pre', {
+                    className: "whitespace-pre-wrap text-gray-800 leading-relaxed text-sm"
+                  }, refinedRecs)
                 )
               )
             )
